@@ -4,13 +4,14 @@ ASM = merlin32
 SRC = pong.asm
 OUT = PONG
 
-all: $(OUT)
+all: $(OUT) dsk
 
 $(OUT): $(SRC)
 	$(ASM) -V . $(SRC)
 
 clean:
-	rm -f $(OUT) PONG_BOOT.dsk hello.bas
+	rm -f $(OUT) PONG_BOOT.dsk hello.bas PONG_S01_Segment1_Output.txt \
+		PONG_S01_Segment1_Output_Error.txt PONG_Symbols.txt _FileInformation.txt
 
 dsk: $(OUT)
 	# Create bootable disk
