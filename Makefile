@@ -24,3 +24,6 @@ dsk: $(OUT)
 	echo '10 PRINT CHR$$(4)"BRUN PONG"' > hello.bas
 	ac -bas PONG_BOOT.dsk HELLO < hello.bas
 	rm hello.bas
+
+run: all
+	osascript ./Virtual][Emulation.scpt
