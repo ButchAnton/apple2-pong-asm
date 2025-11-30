@@ -4,7 +4,6 @@
 ; Simple two-player Pong game using text graphics
 ; Player 1 controls: 'A' (up), 'Z' (down)
 ; Player 2 controls: 'K' (up), 'M' (down)
-; Press 'Q' to quit
 
 ; ==============================================================================
 ; Constants and Hardware Addresses
@@ -51,6 +50,16 @@ WIN_W                   =   40                      ; Window width
 WIN_H                   =   40                      ; Window height
 P1_X                    =   2                       ; Player 1 X position
 P2_X                    =   37                      ; Player 2 X position
+
+; Keys
+A                       =   $41                     ; 'A'
+ALC                     =   $61                     ; 'a'
+Z                       =   $5A                     ; 'Z'
+ZLC                     =   $7A                     ; 'z'
+K                       =   $4B                     ; 'K'
+KLC                     =   $6B                     ; 'k'
+M                       =   $4D                     ; 'M'
+MLC                     =   $6D                     ; 'm'
 
 ; ==============================================================================
 ; Main Program
@@ -272,12 +281,12 @@ CheckBottom
 CheckHorizontal
                                                     ; Check Left Side (Player 1)
                         LDA BallX
-                        CMP #P1_X                   + 1   ; Just past the paddle
+                        CMP #P1_X+1                 ; Just past the paddle
                         BEQ CheckP1Collision
 
                                                     ; Check Right Side (Player 2)
                         LDA BallX
-                        CMP #P2_X                   - 1   ; Just before the paddle
+                        CMP #P2_X-1                 ; Just before the paddle
                         BEQ CheckP2Collision
 
                                                     ; Check Scoring (Left Wall)
@@ -370,23 +379,23 @@ KeyPressed
                         AND #$7F                    ; Clear high bit to get ASCII
 
                                                     ; Check Player 1 Keys
-                        CMP #$61                    ; 'a' (Lower case)
+                        CMP #ALC
                         BEQ P1Up
-                        CMP #$41                    ; 'A'
+                        CMP #A
                         BEQ P1Up
-                        CMP #$7A                    ; 'z'
+                        CMP #ZLC
                         BEQ P1Down
-                        CMP #$5A                    ; 'Z'
+                        CMP #Z
                         BEQ P1Down
 
                                                     ; Check Player 2 Keys
-                        CMP #$6B                    ; 'k'
+                        CMP #KLC
                         BEQ P2Up
-                        CMP #$4B                    ; 'K'
+                        CMP #K
                         BEQ P2Up
-                        CMP #$6D                    ; 'm'
+                        CMP #MLC
                         BEQ P2Down
-                        CMP #$4D                    ; 'M'
+                        CMP #M
                         BEQ P2Down
 
                         RTS
