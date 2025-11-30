@@ -1,11 +1,10 @@
 # Makefile for Pong
-
 ASM = merlin32
 AC = /opt/homebrew/bin/ac
 SRC = pong.asm
 OUT = PONG
 
-all: $(OUT) dsk
+all: clean $(OUT) dsk
 
 $(OUT): $(SRC)
 	$(ASM) -V . $(SRC)

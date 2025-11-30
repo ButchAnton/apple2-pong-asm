@@ -45,6 +45,7 @@ AQUA                    =   $0E
 WHITE                   =   $0F
 
 ; Game Constants
+SPACE                   =   $A0                     ; ASCII Space
 PADDLE_H                =   6                       ; Paddle height
 WIN_W                   =   40                      ; Window width
 WIN_H                   =   40                      ; Window height
@@ -82,7 +83,7 @@ Init
                         STA LORES
 
                                                     ; 2. Clear Entire Screen ($0400-$07FF) to Black ($00)
-                        LDA #$00
+                        LDA #BLACK
                         LDX #$00
 ClearScreenLoop
                         STA $0400,X
@@ -98,7 +99,7 @@ ClearScreenLoop
                                                     ; Row 22: $0750
                                                     ; Row 23: $07D0
 
-                        LDA #$A0                    ; Space
+                        LDA #SPACE                  ; Space
                         LDX #0
 ClearTextLoop
                         STA $0650,X                 ; Row 20

@@ -19,7 +19,7 @@
     {
       "label": "Run tests",
       "type": "shell",
-      "command": "which ac && make run",
+      "command": "make run",
       "windows": {
         "command": "make run"
       },
