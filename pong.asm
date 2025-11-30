@@ -1,5 +1,10 @@
 ; Pong for Apple II
-; Written for Merlin32 Assembler
+; Written for Merlin32
+; Copyright 2025 by Butch Anton
+; Simple two-player Pong game using text graphics
+; Player 1 controls: 'A' (up), 'Z' (down)
+; Player 2 controls: 'K' (up), 'M' (down)
+; Press 'Q' to quit
 
 ; ==============================================================================
 ; Constants and Hardware Addresses
