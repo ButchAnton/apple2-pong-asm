@@ -45,11 +45,25 @@ WHITE                   =   $0F
 
 ; Game Constants
 SPACE                   =   $A0                     ; ASCII Space
+NUM_COLS                =   40                      ; Number of columns in GR window
+TOP_ROW                 =   0                       ; Top row
+BOTTOM_ROW              =   39                      ; Bottom row
+LEFT_WALL               =   0                       ; Left wall X position
+RIGHT_WALL              =   39                      ; Right wall X position
 PADDLE_H                =   6                       ; Paddle height
 WIN_W                   =   40                      ; Window width
 WIN_H                   =   40                      ; Window height
 P1_X                    =   2                       ; Player 1 X position
 P2_X                    =   37                      ; Player 2 X position
+INITIAL_BALL_XY         =   20                      ; Initial Ball X and Y position
+INITIAL_BALL_VELX       =   1                       ; Initial Ball X velocity
+INITIAL_BALL_VELY       =   $FF                     ; Initial Ball Y velocity
+INITIAL_SCORE           =   0                       ; Initial Score
+SCORE_DISPLAY_ROW       =   21                      ; Row to display scores
+SCORE_DISPLAY_P1_COL    =   10                      ; Column for Player 1 score
+SCORE_DISPLAY_P2_COL    =   30                      ; Column for Player 2 score
+END_SCORE               =   9                       ; Score needed to win
+DELAY                   =   $40                     ; Delay value for frame rate control
 
 ; Keys
 A                       =   $41                     ; 'A'
@@ -116,23 +130,23 @@ ClearTextLoop
                         STA $0750,X                 ; Row 22
                         STA $07D0,X                 ; Row 23
                         INX
-                        CPX #40
+                        CPX #NUM_COLS
                         BNE ClearTextLoop
 
                                                     ; Initialize Variables
-                        LDA #20
+                        LDA #INITIAL_BALL_XY        ; Ball start position, both X and Y are the same
                         STA BallX
                         STA BallY
                         STA P1Y
                         STA P2Y
 
-                        LDA #1
+                        LDA #INITIAL_BALL_VELX
                         STA BallVelX
 
-                        LDA #$FF                    ; -1
+                        LDA #INITIAL_BALL_VELY
                         STA BallVelY
 
-                        LDA #0
+                        LDA #INITIAL_SCORE
                         STA Score1
                         STA Score2
 
@@ -144,9 +158,9 @@ ClearTextLoop
 
 DrawScore
                                                     ; Position Cursor for Player 1 Score
-                        LDA #21                     ; Row 21
+                        LDA #SCORE_DISPLAY_ROW      ; Row 21
                         STA $25                     ; CV
-                        LDA #10                     ; Column 10
+                        LDA #SCORE_DISPLAY_P1_COL   ; Column 10
                         STA $24                     ; CH
                         JSR $FC22                   ; VTAB
 
@@ -155,9 +169,9 @@ DrawScore
                         JSR COUT
 
                                                     ; Position Cursor for Player 2 Score
-                        LDA #21
+                        LDA #SCORE_DISPLAY_ROW
                         STA $25
-                        LDA #30
+                        LDA #SCORE_DISPLAY_P2_COL
                         STA $24
                         JSR $FC22
 
@@ -257,7 +271,7 @@ MoveBall
                                                     ; Wall Collision (Top/Bottom)
                                                     ; Check Top
                         LDA BallY
-                        CMP #0
+                        CMP #TOP_ROW
                         BNE CheckBottom
                                                     ; Bounce
                         LDA BallVelY
@@ -269,7 +283,7 @@ MoveBall
 
 CheckBottom
                         LDA BallY
-                        CMP #39                     ; Bottom of GR window (0-39)
+                        CMP #BOTTOM_ROW             ; Bottom of GR window (0-39)
                         BNE CheckHorizontal
                                                     ; Bounce
                         LDA BallVelY
@@ -291,12 +305,12 @@ CheckHorizontal
 
                                                     ; Check Scoring (Left Wall)
                         LDA BallX
-                        CMP #0
+                        CMP #LEFT_WALL
                         BEQ ScoreP2
 
                                                     ; Check Scoring (Right Wall)
                         LDA BallX
-                        CMP #39
+                        CMP #RIGHT_WALL
                         BEQ ScoreP1
 
                         JMP DoneMove
@@ -311,7 +325,7 @@ CheckP1Collision
                         BCS NoCollision             ; Ball is below paddle (>= Height)
 
                                                     ; Collision! Bounce
-                        LDA #1
+                        LDA #1                      ; Ball now moving right
                         STA BallVelX
                         JMP DoneMove
 
@@ -325,7 +339,7 @@ CheckP2Collision
                         BCS NoCollision
 
                                                     ; Collision! Bounce
-                        LDA #$FF                    ; -1
+                        LDA #$FF                    ; Ball now moving left
                         STA BallVelX
                         JMP DoneMove
 
@@ -335,7 +349,7 @@ NoCollision
 ScoreP1
                         INC Score1
                         LDA Score1
-                        CMP #9
+                        CMP #END_SCORE
                         BEQ GameOver
                         JSR ResetBall
                         JMP DoneMove
@@ -343,7 +357,7 @@ ScoreP1
 ScoreP2
                         INC Score2
                         LDA Score2
-                        CMP #9
+                        CMP #END_SCORE
                         BEQ GameOver
                         JSR ResetBall
                         JMP DoneMove
@@ -354,12 +368,14 @@ Freeze
                         JMP Freeze
 
 ResetBall
-                        LDA #20
+                        LDA #INITIAL_BALL_XY
                         STA BallX
                         STA BallY
                                                     ; Reset velocity or randomize? Let's just keep it simple.
-                        LDA #1
+                        LDA #INITIAL_BALL_VELX
                         STA BallVelX
+                        LDA #INITIAL_BALL_VELY
+                        STA BallVelY
                         RTS
 
 DoneMove
@@ -415,7 +431,7 @@ P1Down
                         LDA P1Y
                         CLC
                         ADC #PADDLE_H
-                        CMP #40                     ; Bottom of screen
+                        CMP #BOTTOM_ROW             ; Bottom of screen (was 40)
                         BCS NoKey                   ; Already at bottom
                         JSR ErasePaddle1
                         INC P1Y
@@ -424,7 +440,7 @@ P1Down
                         LDA P1Y
                         CLC
                         ADC #PADDLE_H
-                        CMP #40
+                        CMP #BOTTOM_ROW             ; Bottom of screen (was 40)
                         BCS DoneP1Down
                         INC P1Y
 DoneP1Down
@@ -445,7 +461,7 @@ P2Down
                         LDA P2Y
                         CLC
                         ADC #PADDLE_H
-                        CMP #40
+                        CMP #BOTTOM_ROW
                         BCS NoKey
                         JSR ErasePaddle2
                         INC P2Y
@@ -454,7 +470,7 @@ P2Down
                         LDA P2Y
                         CLC
                         ADC #PADDLE_H
-                        CMP #40
+                        CMP #BOTTOM_ROW
                         BCS DoneP2Down
                         INC P2Y
 DoneP2Down
@@ -466,7 +482,7 @@ NoKey
 WaitFrame
                         LDX #$00
 WaitLoop1
-                        LDY #$40                    ; Adjust for speed
+                        LDY #DELAY                  ; Adjust for speed
 WaitLoop2
                         DEY
                         BNE WaitLoop2
